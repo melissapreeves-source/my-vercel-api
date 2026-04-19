@@ -1,5 +1,4 @@
-// This single file handles ALL routes
-export default async function handler(req, res) {
+export default function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -10,20 +9,10 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
   
+  // Get the path from the URL
   const url = req.url;
   
-  // GET /api or /api/ - Root endpoint
-  if ((url === '/' || url === '/api' || url === '/api/') && req.method === 'GET') {
-    return res.status(200).json({ 
-      message: 'DearSS API is running!',
-      endpoints: {
-        send: 'POST /api/send - Send code and username',
-        getCode: 'GET /api/getCode - Get latest code'
-      }
-    });
-  }
-  
-  // POST /api/send - Receive data
+  // POST to /api/send
   if (url === '/send' && req.method === 'POST') {
     const { username, code } = req.body;
     
@@ -38,11 +27,10 @@ export default async function handler(req, res) {
       timestamp: Date.now()
     };
     
-    console.log(`Received from ${username}`);
     return res.status(200).json({ status: 'success', message: 'Data stored' });
   }
   
-  // GET /api/getCode - Retrieve data
+  // GET from /api/getCode
   if (url === '/getCode' && req.method === 'GET') {
     const payload = global.latestPayload;
     
@@ -55,6 +43,17 @@ export default async function handler(req, res) {
       username: payload.username,
       code: payload.code,
       timestamp: payload.timestamp
+    });
+  }
+  
+  // GET to /api (root)
+  if (url === '/' || url === '/api' || url === '/api/') {
+    return res.status(200).json({ 
+      message: 'DearSS API is running!',
+      endpoints: {
+        send: 'POST /api/send - Send code and username',
+        getCode: 'GET /api/getCode - Get latest code'
+      }
     });
   }
   
